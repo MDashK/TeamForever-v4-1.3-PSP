@@ -1,0 +1,230 @@
+﻿# Sonic 1 Forever & Sonic 2 Absolute - PSP Port
+
+Team Forever's RSDKv4 engine (Sonic 1 Forever and Sonic 2 Absolute) running on the PSP.
+Original source code forked from: https://github.com/ElspethThePict/TeamForever-v4-1.3
+
+
+## Disclaimer
+* This port is AI assisted by Claude.
+
+
+# Requirements
+
+* Needs a PSP with 64MB of RAM: PSP-2000, PSP-3000, PSP Go or PSP Street (E1000). The PSP-1000 is not supported.
+
+## Sonic 1 Forever
+
+* You need to provide your own DATA.RSDK file.
+* MD5: ad10f658daf0f09b367ad7f23e35ff57
+* CRC32: fd57911c
+* Found in Sonic the Hedgehog 1 APK v3.0.0 up to v3.3.0_57
+
+## Sonic 2 Absolute
+
+* You need to provide your own DATA.RSDK file.
+* MD5: 6f1244f8d6e3822778f69bce2d1e8558
+* CRC32: ac8a2fc1
+* Found in Sonic the Hedgehog 2 APK
+
+
+# Installation on the PSP
+
+Use the release package: one folder per game (`s1f` and `s2a`).
+
+1. Install Python 3 on your PC (https://www.python.org, tick "Add python.exe to PATH").
+2. Drag your `Data.rsdk` onto `make_data_psp.bat` (Sonic 1's in the `s1f` folder, Sonic 2's in the `s2a` folder).
+   It makes `PSP\GAME\<game>\Data.psp` next to the `EBOOT.PBP` that is already there.
+3. Copy the `PSP` folder to the root of the Memory Stick:
+
+```
+ms0:/PSP/GAME/Sonic1Forever/
+    EBOOT.PBP
+    Data.psp
+
+ms0:/PSP/GAME/Sonic2Absolute/
+    EBOOT.PBP
+    Data.psp
+```
+
+`settings.ini`, `SData.bin` and `UData.bin` are created in the first run.
+
+`Data.psp` is the game's data made ready for the PSP: your `Data.rsdk` and the mod's files merged into one pack, the
+music as ATRAC3 (played by the PSP's Media Engine), the sound effects already in the engine's format, and the scripts
+precompiled (short loading times).
+
+
+## Status
+
+* 60 FPS on a real PSP (the CPU runs at 333MHz), including the Special Stages of both games.
+* The PSP's GPU (the GE) draws the tile layers, the sprites (rotated too) and the Special Stages' 3D, and scales the
+  game's 424x240 frame to the whole 480x272 screen. The default filter is Sharp Bilinear: Options > Display > Scaling
+  Mode has Nearest, Integer (1:1 with borders), Sharp Bilinear and Bilinear.
+* Music streams from the Memory Stick as ATRAC3; it carries on after sleep mode.
+* The "Mods" menu option is gone: the mod's files are built into `Data.psp`.
+
+
+# Building from source
+
+## The EBOOT
+
+Needs the PSP toolchain, pspdev (https://github.com/pspdev/pspdev), on Linux or WSL2.
+
+```
+cd psp
+make GAME=S1F                 # out/S1F/EBOOT.PBP (also copied to eboot/S1F/)
+make GAME=S2A                 # out/S2A/EBOOT.PBP (also copied to eboot/S2A/)
+make GAME=S1F BUILD_PRX=1     # out/S1F/RSDKv4.prx, to run through PSPLink
+```
+
+The engine is the same for both games: only the XMB's title and icon (`psp/icons/<GAME>/ICON0.PNG`) change.
+
+## The data
+
+`make_data_psp.bat` (Windows) runs `tools/build_psp_data.py`, which can also be run directly (Linux, WSL):
+
+```
+python3 tools/build_psp_data.py /path/to/Data.rsdk --out .
+```
+
+It needs ffmpeg and atracdenc (https://github.com/dcherednik/atracdenc). It tells the game by the Data.rsdk's MD5,
+takes the mod's files from `patch/<mod>/`, and puts `eboot/<GAME>/EBOOT.PBP` (when built) next to the `Data.psp`.
+
+`patch/<mod>/` holds Team Forever's mod files (`Data`, `Scripts`, `mod.ini`) and `PSP/ScriptCache`: the scripts,
+precompiled. After changing a script, make the cache again: put an empty `makescriptcache.txt` in the game's folder
+and load a stage; the game writes `scache/*.bin` and quits. Copy those files to `patch/<mod>/PSP/ScriptCache/`.
+
+## Testing on the PSP
+
+* Through PSPLink: `./RSDKv4.prx ms0:/PSP/GAME/Sonic1Forever` (the data folder as the argument). Runs like this also
+  print a frame profiler (`[prof]` lines) and write `log.txt` in the data folder.
+* `autoinput.txt` in the data folder plays scripted input, one step per line (`<frame> <frames> <button>`,
+  `<frame> <list> STAGE <scene>` to go to a stage, `<frame> QUIT` to end the run, which also deletes the file).
+
+
+## Credits
+
+* Sonic 1 Forever and Sonic 2 Absolute: Team Forever.
+* RSDKv4 decompilation: Rubberduckycooly and RMGRich. Original RSDK author: Christian "Taxman" Whitehead.
+* The TeamForever-v4-1.3 source: ElspethThePict.
+* pspdev, the PSP toolchain and SDK. atracdenc, the ATRAC3 encoder: Daniil Cherednik.
+
+
+---------------------------
+
+Original Read-Me:
+
+![](header.png?raw=true)
+# **SUPPORT THE OFFICIAL RELEASE OF SONIC 1 & 2**
++ Without assets from the official releases, this decompilation will not run.
++ For tutorials on how to find the game assets from your legally obtained copy of the game(s), see [this tutorial for Android](https://gamebanana.com/tuts/14492) or [this tutorial for iOS](https://gamebanana.com/tuts/14491).
+
++ You can get the official releases of Sonic 1 & Sonic 2 from:
+  * [Sonic 1 (iOS, Via the App Store)](https://apps.apple.com/au/app/sonic-the-hedgehog-classic/id316050001)
+  * [Sonic 2 (iOS, Via the App Store)](https://apps.apple.com/au/app/sonic-the-hedgehog-2-classic/id347415188)
+  * [Sonic 1 (Android, Via Google Play)](https://play.google.com/store/apps/details?id=com.sega.sonic1px&hl=en_AU&gl=US)
+  * [Sonic 2 (Android, Via Google Play)](https://play.google.com/store/apps/details?id=com.sega.sonic2.runner&hl=en_AU&gl=US)
+  * [Sonic 1 (Android, Via Amazon)](https://www.amazon.com.au/Sega-of-America-Sonic-Hedgehog/dp/B00D74DVKM)
+  * [Sonic 2 (Android, Via Amazon)](https://www.amazon.com.au/Sega-of-America-Sonic-Hedgehog/dp/B00HAPRVWS)
+
+Even if your platform isn't supported by the official releases, you **must** buy or officially download it for the assets (you don't need to run the official release, you just need the game assets).
+
+If you want to transfer your save(s) from the official mobile version(s), the **Android pre-forever** file path is `Android/data/com.sega.sonic1 or 2/SGame.bin` (other versions may have different file paths). Copy that file into the decompilation's folder with the name `SData.bin`.
+
+# Additional Tweaks
+* Added a built in script compiler. Similar to the one found in RSDKv3, but tweaked up to match the new syntax for the scripts used in RSDKv4.
+* Added a built in mod loader and API, allowing to easily create and play mods with features such as save file redirection, custom achievements and XML GameConfig data.
+* Custom menu and networking system for Sonic 2 multiplayer, allowing anyone to host and join servers and play 2P VS.
+* There is now a `settings.ini` file that the game uses to load all settings, similar to Sonic Mania.
+* The dev menu can now be accessed from anywhere by pressing the `ESC` key if enabled in the config.
+* The `F12` pause, `F11` step over & fast forward debug features from Sonic Mania have all been ported and are enabled if `devMenu` is enabled in the config.
+* A number of additional dev menu debug features have been added:
+  * `F1` will load the first scene in the Presentation stage list (usually the title screen).
+  * `F2` and `F3` will load the previous and next scene in the current stage list.
+  * `F5` will reload the current scene, as well as all assets and scripts.
+  * `F8` and `F9` will visualize touch screen and object hitboxes.
+  * `F10` will activate a palette overlay that shows the game's 8 internal palettes in real time.
+* Added the idle screen dimming feature from Sonic Mania Plus, as well as allowing the user to disable it or set how long it takes for the screen to dim.
+
+# How to build
+## Windows
+* Clone the repo, then follow the instructions in the [depencencies readme for Windows](./dependencies/windows/dependencies.txt) to setup dependencies, then build via the visual studio solution.
+* Alternatively, you can grab a prebuilt executable from the releases section.
+
+## Windows via MSYS2 (64-bit Only)
+### Decompilation
+* Download the newest version of the MSYS2 installer from [here](https://www.msys2.org/) and install it.
+* Run the MINGW64 prompt (from the windows Start Menu/MSYS2 64-bit/MSYS2 MinGW 64-bit), when the program starts enter `pacman -Syuu` in the prompt and hit Enter.
+* Press `Y` when it asks if you want to update packages. If it asks you to close the prompt, do so, then restart it and run the same command again. This updates the packages to their latest versions.
+* Install the dependencies with the following command: `pacman -S pkg-config make git mingw-w64-i686-gcc mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-glew`
+* Clone the repo with the following command: `git clone --recursive https://github.com/Rubberduckycooly/Sonic-1-2-2013-Decompilation.git`
+* Go into the repo you just cloned with `cd Sonic-1-2-2013-Decompilation`.
+* Run `make -f Makefile.msys2 CXX=x86_64-w64-mingw32-g++ CXXFLAGS=-static -j4`.
+  * -j switch is optional, but will make building faster by running it parallel on multiple cores (8 cores would be -j9).
+
+## Windows UWP (Phone, Xbox, etc.)
+* Clone the repo, then follow the instructions in the [depencencies readme for Windows](./dependencies/windows/dependencies.txt) and [depencencies readme for UWP](./dependencies/windows-uwp/dependencies.txt) to setup dependencies.
+* Copy your `Data.rsdk` file into `Sonic1Decomp.UWP` or `Sonic2Decomp.UWP` depending on the game, then build and deploy via `RSDKv4.UWP.sln`.
+* You may also need to generate visual assets. To do so, open the Package.appxmanifest file in the designer. Under the Visual Assets tab, select an image of your choice, and click generate.
+
+## Linux
+### Decompilation
+* To setup your build enviroment and library dependecies, run the following commands:
+  * Ubuntu (Mint, Pop!_OS, etc...): `sudo apt install build-essential git libsdl2-dev libvorbis-dev libogg-dev libglew-dev libtheora-dev`
+    * If you're using Debian, add `libgbm-dev` and `libdrm-dev`.
+  * Arch Linux: `sudo pacman -S base-devel git sdl2 libvorbis libogg glew libtheora`
+  * Clone the repo and its other dependencies with the following command: `git clone --recursive https://github.com/Rubberduckycooly/Sonic-1-2-2013-Decompilation.git`
+  * Go into the repo you just cloned with `cd Sonic-1-2-2013-Decompilation`.
+  * Run `make -j5`.
+    * If your distro is using gcc 8.x.x, then add the argument `LIBS=-lstdc++fs`.
+    * -j switch is optional, but will make building faster by running it parallel on multiple cores (8 cores would be -j9).
+
+## Mac
+* Clone the repo, follow the instructions in the [depencencies readme for Mac](./dependencies/mac/dependencies.txt) to setup dependencies, then build via the Xcode project.
+* A Mac build of v1.3.0 by [Sappharad](https://github.com/Sappharad) can be found [here](https://github.com/Sappharad/Sonic-1-2-2013-Decompilation/releases/tag/1.3.0mac).
+
+## Android
+* Clone the repo, then follow the instructions in the [depencencies readme for Android](./dependencies/android/dependencies.txt).
+* Ensure the symbolic links in `android/app/jni` are correct. If not, fix them with the following on Windows:
+  * `mklink /D src ..\..\..`
+  * `mklink /D SDL ..\..\..\dependencies\android\SDL`
+* Open `android/` in Android Studio, install the NDK and everything else that it asks for, and build.
+
+## Unofficial Branches
+Follow the installation instructions in the readme of each branch.
+* For the **PlayStation Vita**, go to [Xeeynamo's fork](https://github.com/xeeynamo/Sonic-1-2-2013-Decompilation).
+* For the **Nintendo Switch**, go to [heyjoeway's fork](https://github.com/heyjoeway/Sonic-1-2-2013-Decompilation).
+* For the **Nintendo 3DS**, go to [JeffRuLz's fork](https://github.com/JeffRuLz/Sonic-1-2-2013-Decompilation).
+  * A New Nintendo 3DS is required for the games to run smoothly.
+* To play it on the web using **Wasm**, go to [mattConn's fork](https://github.com/mattConn/Sonic-Decompilation-WASM).
+
+Because these branches are unofficial, we cannot provide support for them and they may not be up-to-date.
+
+## Other Platforms
+Currently the only supported platforms are the ones listed above, however the backend uses libogg, libvorbis & SDL2 to power it (as well as tinyxml2 for the mod API and asio for networking), so the codebase is very multiplatform.
+If you're able to, you can clone this repo and port it to a platform not on the list.
+
+# Server
+The multiplayer server requires Python 3.8 or later. You can download Python [here](https://www.python.org/downloads/).
+To use the server, open Command Prompt in the folder [Server.py](https://github.com/Rubberduckycooly/Sonic-1-2-2013-Decompilation/blob/main/Server/Server.py) is located in, then run the command `py -3 Server.py [local IPv4 address] [port] debug`. You can find your local IPv4 address using the command `ipconfig`.
+Note that the CPP server found in the Server folder in the repo has been deprecated and no longer works. It has been kept in the repo for reference purposes.
+
+# FAQ
+### Q: The screen is tearing, how do I fix it?
+A: Try turning on VSync in settings.ini.
+
+### Q: I found a bug!
+A: Submit an issue in the issues tab and we _might_ fix it in the main branch. Don't expect any future releases, however.
+
+### Q: Will you do a decompilation for Sonic CD (2011)?
+A: I already have! You can find it [here](https://github.com/Rubberduckycooly/Sonic-CD-11-Decompilation).
+
+### Q: Will you do a decompilation for Sonic Mania?
+A: No. Sonic Mania is much bigger and requires that I'd decompile not only how the (far more complex) RSDKv5 works, but also all _600+_ objects work.
+
+# Special Thanks
+* [Chuli](https://github.com/MGRich) for helping me fix bugs, tweaking up my sometimes sloppy code and generally being really helpful and fun to work with on this project.
+* The Weigman for creating the header you see up here along with similar assets.
+* Everyone in the [Retro Engine Modding Server](https://dc.railgun.works/retroengine) for being supportive of me and for giving me a place to show off these things that I've found.
+
+# Contact:
+Join the [Retro Engine Modding Discord Server](https://dc.railgun.works/retroengine) for any extra questions you may need to know about the decompilation or modding it.

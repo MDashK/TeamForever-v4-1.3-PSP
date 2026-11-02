@@ -1,0 +1,94 @@
+
+
+
+//-------Aliases-------//
+
+// Function declarations
+reserve function RedStar_Damage
+// Static Values
+
+// Tables
+
+function RedStar_Damage
+	CheckEqual(currentPlayer, 0)
+	temp0 = checkResult
+	CheckEqual(PlayerObject_SuperState, 1)
+	temp0 &= checkResult
+	if temp0 == 1
+		object[currentPlayer].value0--
+	else
+		CallFunction(PlayerObject_Hit)
+	end if
+end function
+
+event ObjectMain
+	object.animationTimer++
+	if object.animationTimer >= 4
+		object.animationTImer = 0
+		object.frame++
+		object.frame &= 3
+	end if
+	switch object.state
+	case 0
+		object.ypos += object.yvel
+		object.xpos += object.xvel
+		object.value0++
+		if object.value0 >= 100
+			object.value0 = 0
+			PlaySfx(SfxName[Large Laser], 0)
+			if object.angle == 0 //rightrward
+				object.state = 1
+			else
+				object.state = 2
+			end if
+		end if
+		break
+	case 1
+		foreach (GROUP_PLAYERS, currentPlayer, ACTIVE_ENTITIES)
+			if object[currentPlayer].xpos > object.xpos
+				CallFunction(RedStar_Damage)
+			end if
+		next
+		object.value0++
+		if object.value0 >= 120
+			ResetObjectEntity(object.entityPos, TypeName[Blank Object], 0, 0, 0)
+		end if
+		break
+	case 2
+		foreach (GROUP_PLAYERS, currentPlayer, ACTIVE_ENTITIES)
+			if object[currentPlayer].xpos < object.xpos
+				CallFunction(RedStar_Damage)
+			end if
+		next
+		object.value0++
+		if object.value0 >= 120
+			ResetObjectEntity(object.entityPos, TypeName[Blank Object], 0, 0, 0)
+		end if
+		break
+	end switch
+end event
+
+
+event ObjectDraw
+	DrawSprite(object.frame)
+	temp0 = object.xpos
+	temp0 >>= 16
+	temp0 -= screen.xoffset
+	switch object.state
+	case 1
+		DrawRect(temp0, 0, screen.xsize, screen.ysize, 224, 224, 224, 224)
+		break
+	case 2
+		DrawRect(0, 0, temp0, screen.ysize, 224, 224, 224, 224)
+		break
+	end switch
+end event
+
+
+event ObjectStartup
+	LoadSpriteSheet("Global/Items.gif")
+	SpriteFrame(-1, -1, 3, 3, 76, 214)
+	SpriteFrame(-3, -3, 7, 7, 68, 214)
+	SpriteFrame(-7, -7, 15, 15, 52, 214)
+	SpriteFrame(-3, -3, 7, 7, 68, 214)
+end event

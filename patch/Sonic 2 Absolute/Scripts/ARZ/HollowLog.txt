@@ -1,0 +1,64 @@
+
+
+//-------Aliases-------//
+private alias object.value0 : rock.ypos
+
+// Function declarations
+reserve function HollowLog_DebugDraw
+reserve function HollowLog_DebugSpawn
+
+// Static Values
+
+// Tables
+
+
+function HollowLog_DebugDraw
+	DrawSprite(18)
+end function
+
+
+function HollowLog_DebugSpawn
+	CreateTempObject(TypeName[Hollow Log], 0, object.xpos, object.ypos)
+	object[tempObjectPos].drawOrder = 4
+end function
+
+event ObjectMain
+	foreach (GROUP_PLAYERS, currentPlayer, ACTIVE_ENTITIES)
+		BoxCollisionTest(C_BOX, object.entityPos, -41, -24, 41, -20, currentPlayer, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+		BoxCollisionTest(C_BOX, object.entityPos, -49, 24, 48, 25, currentPlayer, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+	next
+end event
+
+
+event ObjectDraw
+	DrawSprite(0)
+end event
+
+
+event ObjectStartup
+	LoadSpriteSheet("ARZ/Objects3.gif")	
+	SpriteFrame(-49, -24, 97, 48, 1, 46)
+	
+	
+	foreach (TypeName[Hollow Log], arrayPos0, ALL_ENTITIES)
+		object[arrayPos0].drawOrder = 4
+		object[arrayPos0].priority = PRIORITY_ACTIVE
+		stage.curYBoundary2 = 1920
+		stage.deathBoundary = stage.curYBoundary2
+		stage.deathBoundary <<= 16
+	next
+	
+	SetTableValue(TypeName[Hollow Log], DebugMode_ObjCount, DebugMode_TypesTable)
+	SetTableValue(HollowLog_DebugDraw, DebugMode_ObjCount, DebugMode_DrawTable)
+	SetTableValue(HollowLog_DebugSpawn, DebugMode_ObjCount, DebugMode_SpawnTable)
+	DebugMode_ObjCount++
+end event
+
+event RSDKDraw
+	DrawSprite(0)
+end event
+
+event RSDKLoad
+	LoadSpriteSheet("Global/Display.gif")
+	SpriteFrame(-16, -16, 32, 32, 1, 143)
+end event
